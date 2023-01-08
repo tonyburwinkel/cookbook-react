@@ -1,17 +1,6 @@
 import {useState, useEffect} from 'react'
 import axios from 'axios'
 
-const GroceryList = (props) => {
-	return(
-	<div>
-		<h3> Groceries </h3>
-		<ul>
-			{props.groceries.map(item=> <li key={item.id}> {item.name} </li>)}
-		</ul>
-	</div>
-	)
-}
-
 const App = () => {
 	const [groceries, setGroceries] = useState([])
 	const [current, setCurrent] = useState('')
@@ -25,6 +14,33 @@ const App = () => {
 	}
 
 	useEffect(groceryHook, [])
+
+
+	const deleteItem = (id) => {
+		console.log(id)
+		axios
+			.delete(`http://localhost:3001/groceries/${id}`)
+			.then(response=>{
+				setGroceries(groceries.filter(item=>item.id!==id))
+				console.log('response',response)
+			})
+	}
+
+	const GroceryList = (props) => {
+
+	return(
+	<div>
+		<h3> Groceries </h3>
+		<ul>
+			{props.groceries.map(item => 
+				<li key={item.id}> {item.name} 
+					<button onClick={()=>deleteItem(item.id)}> x </button>
+				</li>
+				)}
+		</ul>
+	</div>
+	)
+}
 
 	const newGrocery = (event) => {
 		event.preventDefault()
