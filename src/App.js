@@ -1,53 +1,52 @@
 import {useState, useEffect} from 'react'
-import axios from 'axios'
+import groceryService from './services/groceries'
+import './index.css'
 
 const App = () => {
 	const [groceries, setGroceries] = useState([])
 	const [current, setCurrent] = useState('')
 
 	const groceryHook = () => {
-		axios
-			.get('http://localhost:3001/groceries')
-			.then(response=>{
-				setGroceries(response.data)
-			})
-	}
+		groceryService.getAll()
+		.then(startGroceries=>setGroceries(startGroceries))
+		}
 
 	useEffect(groceryHook, [])
 
-
 	const deleteItem = (id) => {
-		console.log(id)
-		axios
-			.delete(`http://localhost:3001/groceries/${id}`)
-			.then(response=>{
-				setGroceries(groceries.filter(item=>item.id!==id))
-				console.log('response',response)
-			})
-	}
+		groceryService.remove(id)
+		setGroceries(groceries.filter(item=>item.id!==id))
+		}
+
+		const replaceItem = (id) => {
+			const replacement = {name: current}
+			groceryService.update(id, replacement).then(replacement=>
+			setGroceries(groceries.map(item=>item.id===id?replacement:item)))
+			setCurrent('')
+		}
 
 	const GroceryList = (props) => {
 
-	return(
-	<div>
-		<h3> Groceries </h3>
-		<ul>
-			{props.groceries.map(item => 
-				<li key={item.id}> {item.name} 
-					<button onClick={()=>deleteItem(item.id)}> x </button>
-				</li>
-				)}
-		</ul>
-	</div>
-	)
-}
+				return(
+					<div>
+						<h3> Groceries </h3>
+						<ul>
+							{props.groceries.map(item => 
+								<li key={item.id} onClick = {()=>replaceItem(item.id)}> {item.name} 
+									<button onClick={()=>deleteItem(item.id)}> x </button>
+								</li>
+								)}
+						</ul>
+					</div>
+					)
+				}
 
 	const newGrocery = (event) => {
 		event.preventDefault()
 		const newItem = {name: current}
-		axios.post('http://localhost:3001/groceries', newItem)
-			.then(response=>{
-		setGroceries(groceries.concat(response.data))
+		groceryService.create(newItem)
+			.then(newGroceries=>{
+		setGroceries(groceries.concat(newGroceries))
 		})
 		setCurrent('')
 	}

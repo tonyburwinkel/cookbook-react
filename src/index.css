@@ -1,0 +1,14 @@
+div {
+	max-width:200px;
+	margin :auto;
+}
+
+h3 {
+	color: blue;
+}
+
+ul {
+	list-style-type:none;
+	display: flex;
+	flex-direction: column;
+}
